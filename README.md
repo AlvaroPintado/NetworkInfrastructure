@@ -97,8 +97,7 @@ Si necesitas depurar un servicio en ejecución:
 ```bash
 docker-compose logs -f
 ```
-
-### Parte 3: Tabla de Servicios
+---
 
 ## 📊 Acceso a los Servicios
 
