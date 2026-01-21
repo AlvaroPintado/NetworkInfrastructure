@@ -97,9 +97,10 @@ Si necesitas depurar un servicio en ejecución:
 ```bash
 docker-compose logs -f
 ```
----
 
 ## 📊 Acceso a los Servicios
+
+---
 
 Una vez desplegada la infraestructura, los servicios principales están disponibles en los siguientes puertos locales (sujeto a configuración en `docker-compose.yml` y `haproxy`):
 
