@@ -1,0 +1,55 @@
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <resources base="http://localhost:5000/">
+    
+    <!-- Endpoint de prueba -->
+    <resource path="ping">
+      <method name="GET">
+        <response>
+          <representation mediaType="text/plain"/>
+        </response>
+      </method>
+    </resource>
+
+    <!-- Proxy general con control de ráfagas y bloqueo de IPs -->
+    <resource path="">
+      <method name="GET">
+        <request>
+          <param name="..." style="query" required="false"/>
+        </request>
+        <response>
+          <representation mediaType="application/json"/>
+          <representation mediaType="text/plain"/>
+        </response>
+      </method>
+
+      <method name="POST">
+        <request>
+          <representation mediaType="application/json"/>
+        </request>
+        <response>
+          <representation mediaType="application/json"/>
+          <representation mediaType="text/plain"/>
+        </response>
+      </method>
+
+      <method name="PUT">
+        <request>
+          <representation mediaType="application/json"/>
+        </request>
+        <response>
+          <representation mediaType="application/json"/>
+          <representation mediaType="text/plain"/>
+        </response>
+      </method>
+
+      <method name="DELETE">
+        <response>
+          <representation mediaType="application/json"/>
+          <representation mediaType="text/plain"/>
+        </response>
+      </method>
+    </resource>
+
+  </resources>
+</application>

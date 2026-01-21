@@ -1,0 +1,18 @@
+{
+  "name": "middleware_http_2_mqtt",
+  "version": "1.0.0",
+  "description": "Este middleware actúa como una capa intermedia entre dispositivos IoT de sensores y un sistema de mensajería MQTT. Recibe datos de sensores a través de endpoints HTTP y los publica en un broker MQTT para su posterior procesamiento.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "mqtt": "^5.11.1"
+  }
+}

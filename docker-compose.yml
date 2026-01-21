@@ -1,0 +1,143 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    volumes:
+      - ./broker_mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+    networks:
+      - ra_network
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ra_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  middleware_token_bucket:
+    build: 
+      context: ./middleware/middleware_token_bucket
+    container_name: middleware_token_bucket
+    ports:
+      - "80:${MIDDLEWARE_TOKEN_BUCKET_PORT}"
+    environment:
+      - PORT=${MIDDLEWARE_TOKEN_BUCKET_PORT}
+      - BUCKET_POINTS=${BUCKET_POINTS}
+      - BUCKET_DURATION=${BUCKET_DURATION}
+    networks:
+      - ra_network
+
+  middleware_http_2_mqtt_inst_1:
+    build:
+      context: ./middleware/middleware_http_2_mqtt
+    container_name: middleware_http_2_mqtt_inst_1
+    environment:
+      - PORT=${MIDDLEWARE_HTTP_MQTT_INST_ONE_PORT}
+      - CRYPT_SECRET_KEY=${CRYPT_SECRET_KEY}
+      - ENABLE_CRYPT=${ENABLE_CRYPT}
+    networks:
+      - ra_network
+    depends_on:
+      - mosquitto
+
+  middleware_http_2_mqtt_inst_2:
+    build:
+      context: ./middleware/middleware_http_2_mqtt
+    container_name: middleware_http_2_mqtt_inst_2
+    environment:
+      - PORT=${MIDDLEWARE_HTTP_MQTT_INST_TWO_PORT}
+      - CRYPT_SECRET_KEY=${CRYPT_SECRET_KEY}
+      - ENABLE_CRYPT=${ENABLE_CRYPT}
+    networks:
+      - ra_network
+    depends_on:
+      - mosquitto
+
+  middleware_mqtt_2_sql:
+    build:
+      context: ./middleware/middleware_mqtt_2_sql
+    container_name: middleware_mqtt_2_sql
+    environment:
+      - PORT=${MIDDLEWARE_MQTT_SQL_PORT}
+    networks:
+      - ra_network
+    depends_on:
+      - mysql
+      - mosquitto
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - middleware_http_2_mqtt_inst_1
+      - middleware_http_2_mqtt_inst_2
+      - middleware_token_bucket
+    networks:
+      - ra_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    networks:
+      - ra_network
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana_data:/var/lib/grafana
+
+  telegram_bot:
+    build:
+      context: ./telegram-bot
+    container_name: telegram_bot
+    networks:
+      - ra_network
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  sensor-simulator:
+    profiles:
+      - simulator
+    build:
+      context: ./sensor-simulator
+    container_name: sensor-simulator
+    environment:
+      - SENSOR_SIMULATOR_DATA_REQUEST_DELAY=${SENSOR_SIMULATOR_DATA_REQUEST_DELAY}
+      - SENSOR_SIMULATOR_URL_BASE=${SENSOR_SIMULATOR_URL_BASE}
+      - CRYPT_SECRET_KEY=${CRYPT_SECRET_KEY}
+      - ENABLE_CRYPT=${ENABLE_CRYPT}
+    networks:
+      - ra_network
+    depends_on:
+      - haproxy
+      - mosquitto
+      - mysql
+      - middleware_mqtt_2_sql
+
+volumes:
+  mysql_data:
+  grafana_data:
+  mosquitto_data:
+  mosquitto_logs:
+
+networks:
+  ra_network:
+    driver: bridge

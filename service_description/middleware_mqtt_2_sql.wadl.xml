@@ -1,0 +1,36 @@
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <resources base="http://localhost:6000/">
+    <resource path="datos">
+      
+      <!-- Método GET: recuperar datos por rango de fechas -->
+      <method name="GET">
+        <request>
+          <param name="desde" style="query" type="xs:dateTime" required="false"/>
+          <param name="hasta" style="query" type="xs:dateTime" required="false"/>
+        </request>
+        <response>
+          <representation mediaType="application/json"/>
+        </response>
+      </method>
+
+      <!-- Método POST: insertar nuevos datos de sensores -->
+      <method name="POST">
+        <request>
+          <representation mediaType="application/json">
+            <param name="timestamp" style="plain" type="xs:dateTime"/>
+            <param name="id_nodo" style="plain" type="xs:int"/>
+            <param name="temperatura" style="plain" type="xs:double"/>
+            <param name="humedad" style="plain" type="xs:double"/>
+            <param name="co2" style="plain" type="xs:double"/>
+            <param name="volatiles" style="plain" type="xs:double"/>
+          </representation>
+        </request>
+        <response>
+          <representation mediaType="application/json"/>
+        </response>
+      </method>
+
+    </resource>
+  </resources>
+</application>

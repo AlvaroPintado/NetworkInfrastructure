@@ -1,0 +1,18 @@
+{
+  "name": "middleware_mqtt_2_sql",
+  "version": "1.0.0",
+  "description": "Este sistema permite recibir datos de sensores a través de MQTT y almacenarlos en una base de datos MySQL.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mqtt": "^5.11.1",
+    "mysql2": "^3.14.0"
+  }
+}
